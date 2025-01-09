@@ -1,4 +1,7 @@
 export enum Path {
   DEPTH = 'depth',
-  TICKER_24H = 'ticker/24hr',
+  TICKER = 'ticker',
+  TWENTY_FOUR_HOUR = '24hr',
+  PRICE = 'price',
+  TRADES = 'trades',
 }

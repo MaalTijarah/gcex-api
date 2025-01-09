@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Path } from './enums';
-import { FilterDepthDto } from './dtos';
+import { FilterDepthDto, FilterTradesDto } from './dtos';
 
 @Controller()
 export class AppController {
@@ -12,8 +12,18 @@ export class AppController {
     return this.appService.getDepth(filterDepthDto);
   }
 
-  @Get(Path.TICKER_24H)
-  public async getTicker() {
-    return this.appService.getTicker();
+  @Get(`${Path.TICKER}/${Path.TWENTY_FOUR_HOUR}`)
+  public async getTicker24hr() {
+    return this.appService.getTicker24hr();
+  }
+
+  @Get(`${Path.TICKER}/${Path.PRICE}`)
+  public async getTickerPrice() {
+    return this.appService.getTickerPrice();
+  }
+
+  @Get(Path.TRADES)
+  public async getTrades(@Query() filterTradesDto: FilterTradesDto) {
+    return this.appService.getTrades(filterTradesDto);
   }
 }

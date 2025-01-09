@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { AppRepository } from './app.repository';
-import { TGetDepthParams } from './types';
+// import { TGetDepthParams } from './types';
 
 @Injectable()
 export class AppService {
   constructor(private readonly appRepository: AppRepository) {}
 
-  public async getDepth(params: TGetDepthParams) {
+  public async getDepth(params: { symbol: string; limit: string }) {
     const { symbol, limit } = params;
 
     const depthResponse = await this.appRepository.fetchDepth({
@@ -17,7 +17,7 @@ export class AppService {
     return depthResponse.data;
   }
 
-  public async getTicker() {
+  public async getTicker24hr() {
     const tickersResponse = await this.appRepository.fetchTickers();
 
     const tickersData = tickersResponse.data;
@@ -57,5 +57,30 @@ export class AppService {
         };
       }),
     );
+  }
+
+  public async getTickerPrice() {
+    const tickersResponse = await this.appRepository.fetchTickers();
+
+    const tickersData = tickersResponse.data;
+
+    return Object.keys(tickersData).map((key) => {
+      const value = tickersData[key];
+
+      return {
+        symbol: value.market,
+        price: value.close,
+      };
+    });
+  }
+
+  public async getTrades(params: { symbol: string; limit: string }) {
+    const { symbol, limit } = params;
+    const dealsResponse = await this.appRepository.fetchDeals({
+      symbol,
+      limit,
+    });
+
+    return dealsResponse.data;
   }
 }
