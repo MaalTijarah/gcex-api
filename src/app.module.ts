@@ -2,8 +2,9 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { LoggerModule } from './core';
-import { EnvVar } from './common';
+import { HttpModule, LoggerModule } from './core';
+import { EnvVar } from './enums';
+import { AppRepository } from './app.repository';
 
 @Module({
   imports: [
@@ -23,8 +24,19 @@ import { EnvVar } from './common';
       }),
       inject: [ConfigService],
     }),
+    // Http
+    HttpModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (config: ConfigService) => {
+        const timeout = +config.get<number>(EnvVar.HTTP_DEFAULT_TIMEOUT);
+        return {
+          timeout,
+        };
+      },
+      inject: [ConfigService],
+    }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppRepository],
 })
 export class AppModule {}
