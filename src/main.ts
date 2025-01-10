@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { EnvVar } from './enums';
 import { LoggerService } from './core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,6 +12,15 @@ async function bootstrap() {
   const logger = app.get<LoggerService>(LoggerService);
 
   const PORT = config.get<number>(EnvVar.HTTP_PORT) ?? 3000;
+
+  // Prefix
+  app.setGlobalPrefix('api', { exclude: ['/'] });
+
+  // Versioning
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({

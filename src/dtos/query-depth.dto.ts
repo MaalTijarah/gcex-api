@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class FilterTradesDto {
+export class QueryDepthDto {
   @IsNotEmpty()
   @IsString()
   symbol: string;

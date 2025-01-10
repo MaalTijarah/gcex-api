@@ -81,6 +81,57 @@ export class AppService {
       limit,
     });
 
-    return dealsResponse.data;
+    const deals = dealsResponse.data;
+
+    return deals.map((deal) => {
+      return {
+        id: deal.id,
+        price: deal.price,
+        qty: deal.amount,
+        time: deal.time,
+        type: deal.type,
+      };
+    });
+  }
+
+  public async getAveragePrice(params: { symbol: string }) {
+    const { symbol } = params;
+
+    const tickersResponse = await this.appRepository.fetchTickers();
+    const tickersData = tickersResponse.data;
+
+    const market = tickersData[symbol];
+
+    const averagePrice = (market.high + market.low) / 2;
+
+    return {
+      price: averagePrice,
+    };
+  }
+
+  public async getExchangeInfo() {
+    return {
+      symbol: 'GCS/USDT',
+      status: 'ENABLED',
+      baseAsset: 'GCS',
+      baseAssetPrecision: 6,
+      quoteAsset: 'USDT',
+      quotePrecision: 3,
+      quoteAssetPrecision: 3,
+      baseCommissionPrecision: 2,
+      quoteCommissionPrecision: 3,
+      orderTypes: ['LIMIT', 'LIMIT_MAKER'],
+      quoteOrderQtyMarketAllowed: false,
+      isSpotTradingAllowed: false,
+      isMarginTradingAllowed: false,
+      quoteAmountPrecision: '5',
+      baseSizePrecision: '0.0001',
+      permissions: ['SPOT', 'LIMIT'],
+      filters: [],
+      maxQuoteAmount: '5000000',
+      makerCommission: '0.002',
+      takerCommission: '0.002',
+      tradeSideType: '1',
+    };
   }
 }
