@@ -13,6 +13,7 @@ import {
 } from './dtos';
 import { Serialize } from './decorators/serialize.decorator';
 import { GetTicker24hrResponseDto } from './dtos/get-ticker-24hr-response.dto';
+import { GetExchange24hrVolumeResponseDto } from './dtos/get-exchange-24hr-volume-response.dto';
 
 @Controller()
 export class AppController {
@@ -60,5 +61,12 @@ export class AppController {
   @HttpCode(HttpStatus.OK)
   public async getExchangeInfo() {
     return this.appService.getExchangeInfo();
+  }
+
+  @Serialize(GetExchange24hrVolumeResponseDto)
+  @Get(Path.EXCHANGE_24HR_VOLUME)
+  @HttpCode(HttpStatus.OK)
+  public async getExchange24hrVolume() {
+    return this.appService.getExchange24hrVolume();
   }
 }

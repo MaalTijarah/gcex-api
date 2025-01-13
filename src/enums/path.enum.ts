@@ -6,4 +6,5 @@ export enum Path {
   TRADES = 'trades',
   AVERAGE_PRICE = 'avg-price',
   EXCHANGE_INFO = 'exchange-info',
+  EXCHANGE_24HR_VOLUME = 'exchange-24hr-volume',
 }

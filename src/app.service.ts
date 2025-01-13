@@ -134,4 +134,24 @@ export class AppService {
       tradeSideType: '1',
     };
   }
+
+  public async getExchange24hrVolume() {
+    const tickersResponse = await this.appRepository.fetchTickers();
+
+    const tickersData = tickersResponse.data;
+
+    let totalVolume = 0;
+
+    Object.keys(tickersData).map((key) => {
+      const value = tickersData[key];
+
+      const volume24hr = value.close * value.volume;
+
+      totalVolume += volume24hr;
+    });
+
+    return {
+      volume: +totalVolume.toFixed(3),
+    };
+  }
 }
