@@ -13,6 +13,8 @@ async function bootstrap() {
 
   const PORT = config.get<number>(EnvVar.HTTP_PORT) ?? 3000;
 
+  app.enableCors();
+
   // Prefix
   app.setGlobalPrefix('api', { exclude: ['/'] });
 
