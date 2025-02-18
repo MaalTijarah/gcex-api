@@ -155,13 +155,8 @@ export class AppService {
     };
   }
 
-  public async getUserBalance(params: { type: string; item: string }) {
-    const { type, item } = params;
-
-    const balanceResponse = await this.appRepository.fetchUserBalance({
-      type,
-      item,
-    });
+  public async getPoRAccountBalance() {
+    const balanceResponse = await this.appRepository.fetchPoRAccountBalance();
 
     const balanceData = balanceResponse.data;
 

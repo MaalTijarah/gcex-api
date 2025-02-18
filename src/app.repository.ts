@@ -24,6 +24,7 @@ enum GcexApiPayload {
 export class AppRepository extends HttpRepository {
   private baseUrl: string;
   private adminUrl: string;
+  private porAccount: string;
 
   constructor(
     protected readonly http: HttpService,
@@ -37,6 +38,7 @@ export class AppRepository extends HttpRepository {
   private initialize() {
     this.baseUrl = this.config.get<string>(EnvVar.GCEX_BASE_URL);
     this.adminUrl = this.config.get<string>(EnvVar.GCEX_ADMIN_URL);
+    this.porAccount = this.config.get<string>(EnvVar.GCEX_POR_ACCOUNT);
   }
 
   public async fetchDepth(params: { symbol: string; limit: string }) {
@@ -89,13 +91,11 @@ export class AppRepository extends HttpRepository {
     });
   }
 
-  public async fetchUserBalance(params: { type: string; item: string }) {
-    const { type, item } = params;
-
+  public async fetchPoRAccountBalance() {
     const balanceFormData = new FormData();
 
-    balanceFormData.append(GcexApiPayload.TYPE, type);
-    balanceFormData.append(GcexApiPayload.ITEM, item);
+    balanceFormData.append(GcexApiPayload.TYPE, 'email');
+    balanceFormData.append(GcexApiPayload.ITEM, this.porAccount);
     balanceFormData.append(GcexApiPayload.CHANNEL, 'gcs');
 
     return this.post<TGcexApiResponse<TAssetBalanceResponseData[]>, FormData>({
