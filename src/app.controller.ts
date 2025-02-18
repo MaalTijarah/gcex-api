@@ -10,6 +10,8 @@ import {
   GetTradeResponseDto,
   GetAveragePriceResponseDto,
   GetExchangeInfoResponseDto,
+  GetUserBalanceResponseDto,
+  QueryUserBalanceDto,
 } from './dtos';
 import { Serialize } from './decorators/serialize.decorator';
 import { GetTicker24hrResponseDto } from './dtos/get-ticker-24hr-response.dto';
@@ -68,5 +70,14 @@ export class AppController {
   @HttpCode(HttpStatus.OK)
   public async getExchange24hrVolume() {
     return this.appService.getExchange24hrVolume();
+  }
+
+  @Serialize(GetUserBalanceResponseDto)
+  @Get(Path.BALANCE)
+  @HttpCode(HttpStatus.OK)
+  public async getUserBalance(
+    @Query() queryUserBalanceDto: QueryUserBalanceDto,
+  ) {
+    return this.appService.getUserBalance(queryUserBalanceDto);
   }
 }

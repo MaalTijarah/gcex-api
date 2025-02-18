@@ -3,3 +3,4 @@ export * from './gcex-api-response.interface';
 export * from './deal-response-data.interface';
 export * from './tickers-response-data.interface';
 export * from './constructable.interface';
+export * from './asset-balance-response-data.interface';

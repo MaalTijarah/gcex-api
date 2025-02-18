@@ -6,3 +6,5 @@ export * from './get-ticker-price.dto';
 export * from './get-trades-response.dto';
 export * from './get-average-price-response.dto';
 export * from './get-exchange-info-response.dto';
+export * from './get-user-balance-response.dto';
+export * from './query-user-balance.dto';

@@ -154,4 +154,17 @@ export class AppService {
       volume: +totalVolume.toFixed(3),
     };
   }
+
+  public async getUserBalance(params: { type: string; item: string }) {
+    const { type, item } = params;
+
+    const balanceResponse = await this.appRepository.fetchUserBalance({
+      type,
+      item,
+    });
+
+    const balanceData = balanceResponse.data;
+
+    return balanceData;
+  }
 }
