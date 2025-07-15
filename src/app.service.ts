@@ -1,10 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { AppRepository } from './app.repository';
+import { EmailsService } from './emails';
+import { Asset } from './types';
+import { Logger } from 'nestjs-pino';
+import { ConfigService } from '@nestjs/config';
+import { EnvVar } from './enums';
+import { Cron, CronExpression } from '@nestjs/schedule';
+
 // import { TGetDepthParams } from './types';
 
 @Injectable()
-export class AppService {
-  constructor(private readonly appRepository: AppRepository) {}
+export class AppService implements OnModuleInit {
+  constructor(
+    private readonly appRepository: AppRepository,
+    private readonly emails: EmailsService,
+    private readonly logger: Logger,
+    private readonly config: ConfigService,
+  ) {}
+
+  async onModuleInit() {
+    // await this.alert()
+  }
 
   public async getDepth(params: { symbol: string; limit: string }) {
     const { symbol, limit } = params;
@@ -156,10 +172,127 @@ export class AppService {
   }
 
   public async getPoRAccountBalance() {
-    const balanceResponse = await this.appRepository.fetchPoRAccountBalance();
+    const balanceResponse = await this.appRepository.fetchAccountBalance(
+      'chief@goldchainex.com',
+    );
 
-    const balanceData = balanceResponse.data;
+    return balanceResponse.data;
+  }
 
-    return balanceData;
+  @Cron(CronExpression.EVERY_HOUR)
+  public async alert() {
+    const recipientsStr = this.config.get<string>(EnvVar.ALERT_RECIPIENTS);
+    const recipients = recipientsStr.split(',');
+    await this.checkBalanceAndAlert(
+      'finance@goldchainex.com',
+      ['GCS', 'USDT'],
+      recipients,
+    );
+
+    await this.checkBalanceAndAlert(
+      'gcvault@goldchainex.com',
+      ['BTC', 'ETH', 'LTC', 'XRP', 'XLM', 'RUSD', 'USDT'],
+      recipients,
+    );
+
+    await this.checkBalanceAndAlert(
+      'Finance@maalchain.com',
+      ['MAAL', 'USDT'],
+      recipients,
+    );
+  }
+
+  private async checkBalanceAndAlert(
+    account: string,
+    allowableAssets: string[],
+    emails: string[],
+  ) {
+    const level1Threshold = 60000;
+    const level2Threshold = 45000;
+    const level3Threshold = 25000;
+
+    const tickersResponse = await this.appRepository.fetchTickers();
+
+    const tickers = tickersResponse.data;
+
+    const balanceResponse =
+      await this.appRepository.fetchAccountBalance(account);
+
+    const rawAssets = balanceResponse.data;
+    const assets = rawAssets.filter((a) => allowableAssets.includes(a.symbol));
+
+    const level1Assets: Asset[] = [];
+    const level2Assets: Asset[] = [];
+    const level3Assets: Asset[] = [];
+
+    await Promise.all(
+      assets.map(async (a) => {
+        const symbol = a.symbol;
+        const available = a.available;
+        const market = symbol + '/USDT';
+
+        let price = 1;
+        let balanceUSDT = 0;
+
+        if (symbol !== 'USDT') {
+          price = tickers[market].close;
+        }
+
+        balanceUSDT = Math.floor(available * price);
+
+        const asset = {
+          symbol,
+          balance: available,
+          balanceUSDT,
+        };
+
+        if (balanceUSDT <= level3Threshold) {
+          level3Assets.push(asset);
+        } else if (balanceUSDT <= level2Threshold) {
+          level2Assets.push(asset);
+        } else if (balanceUSDT <= level1Threshold) {
+          level1Assets.push(asset);
+        }
+
+        return asset;
+      }),
+    );
+
+    if (level1Assets.length !== 0) {
+      await this.emails.alert(
+        emails,
+        1,
+        account,
+        level1Threshold,
+        level1Assets,
+      );
+    }
+
+    if (level2Assets.length !== 0) {
+      await this.emails.alert(
+        emails,
+        2,
+        account,
+        level2Threshold,
+        level2Assets,
+      );
+    }
+
+    if (level3Assets.length !== 0) {
+      await this.emails.alert(
+        emails,
+        3,
+        account,
+        level3Threshold,
+        level3Assets,
+      );
+    }
+
+    console.log(assets);
+    console.log(level1Assets);
+    console.log(level2Assets);
+    console.log(level3Assets);
+
+    this.logger.log('SENT ALERT MESSAGE SUCCEED.');
   }
 }

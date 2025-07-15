@@ -77,4 +77,11 @@ export class AppController {
   public async getPoRAccountBalance() {
     return this.appService.getPoRAccountBalance();
   }
+
+  @Serialize()
+  @Get('alert')
+  @HttpCode(HttpStatus.OK)
+  public async alert() {
+    return this.appService.alert();
+  }
 }

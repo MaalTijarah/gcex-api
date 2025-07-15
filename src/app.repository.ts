@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { HttpRepository, HttpService } from './core';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { HttpRepository, HttpService } from './http';
 import {
   TDepthResponseData,
   TGcexApiResponse,
@@ -8,37 +8,23 @@ import {
   TAssetBalanceResponseData,
 } from './interfaces';
 import { ConfigService } from '@nestjs/config';
-import { EnvVar } from './enums';
-
-enum GcexApiPayload {
-  MARKET = 'market',
-  LIMIT = 'limit',
-  INTERVAL = 'interval',
-  LAST_ID = 'last_id',
-  TYPE = 'type',
-  ITEM = 'item',
-  CHANNEL = 'channel',
-}
+import { EnvVar, GcexApiPayload } from './enums';
 
 @Injectable()
-export class AppRepository extends HttpRepository {
+export class AppRepository extends HttpRepository implements OnModuleInit {
   private baseUrl: string;
   private adminUrl: string;
-  private porAccount: string;
 
   constructor(
     protected readonly http: HttpService,
     private readonly config: ConfigService,
   ) {
     super(http);
-
-    this.initialize();
   }
 
-  private initialize() {
+  onModuleInit(): void {
     this.baseUrl = this.config.get<string>(EnvVar.GCEX_BASE_URL);
     this.adminUrl = this.config.get<string>(EnvVar.GCEX_ADMIN_URL);
-    this.porAccount = this.config.get<string>(EnvVar.GCEX_POR_ACCOUNT);
   }
 
   public async fetchDepth(params: { symbol: string; limit: string }) {
@@ -91,11 +77,11 @@ export class AppRepository extends HttpRepository {
     });
   }
 
-  public async fetchPoRAccountBalance() {
+  public async fetchAccountBalance(email: string) {
     const balanceFormData = new FormData();
 
     balanceFormData.append(GcexApiPayload.TYPE, 'email');
-    balanceFormData.append(GcexApiPayload.ITEM, this.porAccount);
+    balanceFormData.append(GcexApiPayload.ITEM, email);
     balanceFormData.append(GcexApiPayload.CHANNEL, 'gcs');
 
     return this.post<TGcexApiResponse<TAssetBalanceResponseData[]>, FormData>({

@@ -1,0 +1,79 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <title>⚠️ Top-Up Required for {{account}}</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        color: #222;
+        margin: 0;
+        padding: 0;
+      }
+      h1,h2 {
+        color: #d9534f;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      th,
+      td {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+        font-size: 14px;
+      }
+      th {
+        background: #f5f5f5;
+      }
+      tr.zero-balance {
+        background: #fff4f4;
+      }
+      a.btn {
+        display: inline-block;
+        padding: 10px 18px;
+        margin-top: 20px;
+        background: #28a745;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+      }
+      a.btn:hover {
+        background: #218838;
+      }
+      @media only screen and (max-width: 620px) {
+        table,
+        th,
+        td {
+          font-size: 12px;
+        }
+      }
+    </style>
+  </head>
+
+    <!-- Header -->
+    <h1>Alert: Level {{level}}</h1>
+    <h2>Action required: top-up {{account}} market-making account</h2>
+    <h3>The following assets reached below {{threshold}} USDT:</h3>
+    <!-- Balance table -->
+    <table>
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>Balance</th>
+          <th>Value (USDT)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each balances}}
+          <tr>
+            <td>{{symbol}}</td>
+            <td>{{balance}}</td>
+            <td>{{balanceUSDT}}</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </body>
+</html>

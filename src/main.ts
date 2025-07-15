@@ -2,14 +2,15 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { EnvVar } from './enums';
-import { LoggerService } from './core';
+
 import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { Logger } from "nestjs-pino";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = app.get<ConfigService>(ConfigService);
-  const logger = app.get<LoggerService>(LoggerService);
+  const logger = app.get<Logger>(Logger);
 
   const PORT = config.get<number>(EnvVar.HTTP_PORT) ?? 3000;
 
@@ -33,7 +34,7 @@ async function bootstrap() {
   );
 
   await app.listen(PORT, () => {
-    logger.info(`GCEX API SERVER RUNNING ON PORT ${PORT}...`);
+    logger.log(`GCEX API SERVER RUNNING ON PORT ${PORT}...`);
   });
 }
 
