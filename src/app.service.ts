@@ -225,38 +225,37 @@ export class AppService implements OnModuleInit {
     const level2Assets: Asset[] = [];
     const level3Assets: Asset[] = [];
 
-    await Promise.all(
-      assets.map(async (a) => {
-        const symbol = a.symbol;
-        const available = a.available;
-        const market = symbol + '/USDT';
+    const a = assets.map((a) => {
+      const symbol = a.symbol;
+      const available = a.available;
+      const freeze = a.freeze;
+      const market = symbol + '/USDT';
 
-        let price = 1;
-        let balanceUSDT = 0;
+      let price = 1;
+      let balanceUSDT = 0;
 
-        if (symbol !== 'USDT') {
-          price = tickers[market].close;
-        }
+      if (symbol !== 'USDT') {
+        price = tickers[market].close;
+      }
 
-        balanceUSDT = Math.floor(available * price);
+      balanceUSDT = Math.floor(available * price + freeze * price);
 
-        const asset = {
-          symbol,
-          balance: available,
-          balanceUSDT,
-        };
+      const asset = {
+        symbol,
+        balance: available,
+        balanceUSDT,
+      };
 
-        if (balanceUSDT <= level3Threshold) {
-          level3Assets.push(asset);
-        } else if (balanceUSDT <= level2Threshold) {
-          level2Assets.push(asset);
-        } else if (balanceUSDT <= level1Threshold) {
-          level1Assets.push(asset);
-        }
+      if (balanceUSDT <= level3Threshold) {
+        level3Assets.push(asset);
+      } else if (balanceUSDT <= level2Threshold) {
+        level2Assets.push(asset);
+      } else if (balanceUSDT <= level1Threshold) {
+        level1Assets.push(asset);
+      }
 
-        return asset;
-      }),
-    );
+      return asset;
+    });
 
     if (level1Assets.length !== 0) {
       await this.emails.alert(
@@ -288,7 +287,7 @@ export class AppService implements OnModuleInit {
       );
     }
 
-    console.log(assets);
+    console.log(a);
     console.log(level1Assets);
     console.log(level2Assets);
     console.log(level3Assets);
