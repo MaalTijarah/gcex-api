@@ -242,7 +242,7 @@ export class AppService implements OnModuleInit {
 
       const asset = {
         symbol,
-        balance: available,
+        balance: available + freeze,
         balanceUSDT,
       };
 
