@@ -202,12 +202,35 @@ export class AppService implements OnModuleInit {
     );
   }
 
+  @Cron(CronExpression.EVERY_12_HOURS)
+  public async alertLevel1() {
+    const recipientsStr = this.config.get<string>(EnvVar.ALERT_RECIPIENTS);
+    const recipients = recipientsStr.split(',');
+    await this.checkBalanceAndAlertLevel1(
+      'finance@goldchainex.com',
+      ['GCS', 'USDT'],
+      recipients,
+    );
+
+    await this.checkBalanceAndAlertLevel1(
+      'gcvault@goldchainex.com',
+      ['BTC', 'ETH', 'LTC', 'XRP', 'XLM', 'RUSD', 'USDT'],
+      recipients,
+    );
+
+    await this.checkBalanceAndAlertLevel1(
+      'Finance@maalchain.com',
+      ['MAAL', 'USDT'],
+      recipients,
+    );
+  }
+
   private async checkBalanceAndAlert(
     account: string,
     allowableAssets: string[],
     emails: string[],
   ) {
-    const level1Threshold = 60000;
+    // const level1Threshold = 60000;
     const level2Threshold = 45000;
     const level3Threshold = 25000;
 
@@ -221,7 +244,7 @@ export class AppService implements OnModuleInit {
     const rawAssets = balanceResponse.data;
     const assets = rawAssets.filter((a) => allowableAssets.includes(a.symbol));
 
-    const level1Assets: Asset[] = [];
+    // const level1Assets: Asset[] = [];
     const level2Assets: Asset[] = [];
     const level3Assets: Asset[] = [];
 
@@ -246,26 +269,22 @@ export class AppService implements OnModuleInit {
         balanceUSDT,
       };
 
+      // if (balanceUSDT <= level3Threshold) {
+      //   level3Assets.push(asset);
+      // } else if (balanceUSDT <= level2Threshold) {
+      //   level2Assets.push(asset);
+      // } else if (balanceUSDT <= level1Threshold) {
+      //   level1Assets.push(asset);
+      // }
+
       if (balanceUSDT <= level3Threshold) {
         level3Assets.push(asset);
       } else if (balanceUSDT <= level2Threshold) {
         level2Assets.push(asset);
-      } else if (balanceUSDT <= level1Threshold) {
-        level1Assets.push(asset);
       }
 
       return asset;
     });
-
-    if (level1Assets.length !== 0) {
-      await this.emails.alert(
-        emails,
-        1,
-        account,
-        level1Threshold,
-        level1Assets,
-      );
-    }
 
     if (level2Assets.length !== 0) {
       await this.emails.alert(
@@ -288,9 +307,104 @@ export class AppService implements OnModuleInit {
     }
 
     console.log(a);
-    console.log(level1Assets);
+
     console.log(level2Assets);
     console.log(level3Assets);
+
+    this.logger.log('SENT ALERT MESSAGE SUCCEED.');
+  }
+
+  private async checkBalanceAndAlertLevel1(
+    account: string,
+    allowableAssets: string[],
+    emails: string[],
+  ) {
+    const level1Threshold = 60000;
+    const level2Threshold = 45000;
+    // const level3Threshold = 25000;
+
+    const tickersResponse = await this.appRepository.fetchTickers();
+
+    const tickers = tickersResponse.data;
+
+    const balanceResponse =
+      await this.appRepository.fetchAccountBalance(account);
+
+    const rawAssets = balanceResponse.data;
+    const assets = rawAssets.filter((a) => allowableAssets.includes(a.symbol));
+
+    const level1Assets: Asset[] = [];
+    // const level2Assets: Asset[] = [];
+    // const level3Assets: Asset[] = [];
+
+    assets.map((a) => {
+      const symbol = a.symbol;
+      const available = a.available;
+      const freeze = a.freeze;
+      const market = symbol + '/USDT';
+
+      let price = 1;
+      let balanceUSDT = 0;
+      let balance = 0;
+
+      if (symbol !== 'USDT') {
+        price = tickers[market].close;
+        balanceUSDT = Math.floor(available * price + freeze * price);
+        balance = available + freeze;
+      } else {
+        balanceUSDT = Math.floor(available * price);
+        balance = available;
+      }
+
+      const asset = {
+        symbol,
+        balance,
+        balanceUSDT,
+      };
+
+      // if (balanceUSDT <= level3Threshold) {
+      //   level3Assets.push(asset);
+      // } else if (balanceUSDT <= level2Threshold) {
+      //   level2Assets.push(asset);
+      // } else if (balanceUSDT <= level1Threshold) {
+      //   level1Assets.push(asset);
+      // }
+      if (balanceUSDT <= level1Threshold && balanceUSDT > level2Threshold) {
+        level1Assets.push(asset);
+      }
+
+      return asset;
+    });
+
+    if (level1Assets.length !== 0) {
+      await this.emails.alert(
+        emails,
+        1,
+        account,
+        level1Threshold,
+        level1Assets,
+      );
+    }
+
+    // if (level2Assets.length !== 0) {
+    //   await this.emails.alert(
+    //     emails,
+    //     2,
+    //     account,
+    //     level2Threshold,
+    //     level2Assets,
+    //   );
+    // }
+
+    // if (level3Assets.length !== 0) {
+    //   await this.emails.alert(
+    //     emails,
+    //     3,
+    //     account,
+    //     level3Threshold,
+    //     level3Assets,
+    //   );
+    // }
 
     this.logger.log('SENT ALERT MESSAGE SUCCEED.');
   }
