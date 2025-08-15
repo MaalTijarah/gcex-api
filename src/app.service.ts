@@ -179,7 +179,7 @@ export class AppService implements OnModuleInit {
     return balanceResponse.data;
   }
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_MINUTE)
   public async alert() {
     const recipientsStr = this.config.get<string>(EnvVar.ALERT_RECIPIENTS);
     const recipients = recipientsStr.split(',');
@@ -256,16 +256,20 @@ export class AppService implements OnModuleInit {
 
       let price = 1;
       let balanceUSDT = 0;
+      let balance = 0;
 
       if (symbol !== 'USDT') {
         price = tickers[market].close;
+        balanceUSDT = Math.floor(available * price + freeze * price);
+        balance = available + freeze;
+      } else {
+        balanceUSDT = Math.floor(available * price);
+        balance = available;
       }
-
-      balanceUSDT = Math.floor(available * price + freeze * price);
 
       const asset = {
         symbol,
-        balance: available + freeze,
+        balance,
         balanceUSDT,
       };
 
