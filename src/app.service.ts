@@ -179,7 +179,7 @@ export class AppService implements OnModuleInit {
     return balanceResponse.data;
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_HOUR)
   public async alert() {
     const recipientsStr = this.config.get<string>(EnvVar.ALERT_RECIPIENTS);
     const recipients = recipientsStr.split(',');
