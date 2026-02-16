@@ -202,7 +202,7 @@ export class AppService implements OnModuleInit {
     );
   }
 
-  @Cron(CronExpression.EVERY_12_HOURS)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   public async alertLevel1() {
     const recipientsStr = this.config.get<string>(EnvVar.ALERT_RECIPIENTS);
     const recipients = recipientsStr.split(',');
@@ -214,7 +214,7 @@ export class AppService implements OnModuleInit {
 
     await this.checkBalanceAndAlertLevel1(
       'gcvault@goldchainex.com',
-      ['BTC', 'ETH', 'LTC', 'XRP', 'XLM', 'RUSD', 'USDT'],
+      ['BTC', 'ETH', 'LTC', 'XRP', 'XLM', 'USDT'],
       recipients,
     );
 
@@ -331,6 +331,8 @@ export class AppService implements OnModuleInit {
 
     const tickers = tickersResponse.data;
 
+    console.log(tickers);
+
     const balanceResponse =
       await this.appRepository.fetchAccountBalance(account);
 
@@ -352,6 +354,7 @@ export class AppService implements OnModuleInit {
       let balance = 0;
 
       if (symbol !== 'USDT') {
+        console.log("Symbol: ", symbol)
         price = tickers[market].close;
         balanceUSDT = Math.floor(available * price + freeze * price);
         balance = available + freeze;
