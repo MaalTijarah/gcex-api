@@ -202,7 +202,7 @@ export class AppService implements OnModuleInit {
     );
   }
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_10_HOURS)
   public async alertLevel1() {
     const recipientsStr = this.config.get<string>(EnvVar.ALERT_RECIPIENTS);
     const recipients = recipientsStr.split(',');
@@ -331,8 +331,6 @@ export class AppService implements OnModuleInit {
 
     const tickers = tickersResponse.data;
 
-    console.log(tickers);
-
     const balanceResponse =
       await this.appRepository.fetchAccountBalance(account);
 
@@ -354,7 +352,6 @@ export class AppService implements OnModuleInit {
       let balance = 0;
 
       if (symbol !== 'USDT') {
-        console.log("Symbol: ", symbol)
         price = tickers[market].close;
         balanceUSDT = Math.floor(available * price + freeze * price);
         balance = available + freeze;
