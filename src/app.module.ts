@@ -8,6 +8,7 @@ import { EnvVar } from './enums';
 import { AppRepository } from './app.repository';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailsModule } from './emails';
+import { SrCardsModule } from './sr-cards/sr-cards.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { EmailsModule } from './emails';
       inject: [ConfigService],
     }),
     EmailsModule,
+    SrCardsModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppRepository],

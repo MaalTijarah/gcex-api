@@ -51,4 +51,25 @@ export class EmailsService {
       this.logger.error(JSON.stringify(error));
     }
   }
+
+  async srCardsAlert(
+    to: string[],
+    threshold: number,
+    balances: { total: number; currency: string }[],
+  ) {
+    try {
+      const data = await this.mailer.sendMail({
+        to,
+        subject: '⚠️ Card-Pro (Admin Account) Balance Alert',
+        template: 'sr-cards-alert',
+        context: {
+          threshold,
+          balances,
+        },
+      });
+      this.logger.log(JSON.stringify(data));
+    } catch (error) {
+      this.logger.error(JSON.stringify(error));
+    }
+  }
 }

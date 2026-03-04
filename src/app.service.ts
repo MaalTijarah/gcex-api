@@ -202,7 +202,7 @@ export class AppService implements OnModuleInit {
     );
   }
 
-  @Cron(CronExpression.EVERY_10_HOURS)
+  @Cron(CronExpression.EVERY_8_HOURS)
   public async alertLevel1() {
     const recipientsStr = this.config.get<string>(EnvVar.ALERT_RECIPIENTS);
     const recipients = recipientsStr.split(',');
