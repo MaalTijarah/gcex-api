@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
 import { EnvVar } from 'src/enums';
@@ -30,8 +30,8 @@ export class SrCardsService {
     private readonly logger: Logger,
   ) {}
 
-  @Cron('0 */6 * * *') // Every 6 hours
-  // @Cron(CronExpression.EVERY_10_SECONDS)
+  // @Cron('0 */6 * * *') // Every 6 hours
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async checkBalanceAndAlert() {
     this.logger.log('SR Cards: Starting balance check...');
 

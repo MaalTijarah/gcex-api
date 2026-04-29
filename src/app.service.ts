@@ -179,6 +179,12 @@ export class AppService implements OnModuleInit {
     return balanceResponse.data;
   }
 
+  public async getAccountBalance(email: string) {
+    const balanceResponse = await this.appRepository.fetchAccountBalance(email);
+
+    return balanceResponse.data;
+  }
+
   @Cron(CronExpression.EVERY_HOUR)
   public async alert() {
     const recipientsStr = this.config.get<string>(EnvVar.ALERT_RECIPIENTS);

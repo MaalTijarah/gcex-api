@@ -78,6 +78,13 @@ export class AppController {
     return this.appService.getPoRAccountBalance();
   }
 
+  @Serialize(GetUserBalanceResponseDto)
+  @Get(`${Path.ACCOUNT}/${Path.BALANCE}`)
+  @HttpCode(HttpStatus.OK)
+  public async getAccountBalance(@Query('email') email: string) {
+    return this.appService.getAccountBalance(email);
+  }
+
   @Serialize()
   @Get('alert')
   @HttpCode(HttpStatus.OK)
