@@ -17,6 +17,8 @@ export class EmailsService {
     const code = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
     this.otpStore.set(to, code);
 
+    console.log(this.otpStore)
+
     try {
       const data = await this.mailer.sendMail({
         to,
@@ -36,9 +38,10 @@ export class EmailsService {
   verifyCode(email: string, code: string): boolean {
     console.log("email", email, "Code: ", code)
     const stored = this.otpStore.get(email);
+    console.log("Stored: ", stored)
     if (!stored) return false;
     const valid = stored === code;
-    if (valid) this.otpStore.delete(email);
+    // if (valid) this.otpStore.delete(email);
     return valid;
   }
 

@@ -82,7 +82,7 @@ export class AppController {
   @Serialize(GetUserBalanceResponseDto)
   @Get(`${Path.ACCOUNT}/${Path.BALANCE}`)
   @HttpCode(HttpStatus.OK)
-  // @UseGuards(OtpAuthGuard)
+  @UseGuards(OtpAuthGuard)
   public async getAccountBalance(@Query('email') email: string) {
     return this.appService.getAccountBalance(email);
   }

@@ -14,7 +14,10 @@ export class OtpAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<Request>();
     const email = req.query['email'] as string;
-    const code = req.headers['x-otp-code'] as string;
+    const code = req.query['otp'] as string;
+
+    console.log("email: ", email)
+    console.log("otp: ", code)
 
     if (!email || !code) {
       throw new UnauthorizedException('Incorrect Credentials');
