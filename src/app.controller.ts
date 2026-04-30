@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Query, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Path } from './enums';
 import {
@@ -15,6 +15,7 @@ import {
 import { Serialize } from './decorators/serialize.decorator';
 import { GetTicker24hrResponseDto } from './dtos/get-ticker-24hr-response.dto';
 import { GetExchange24hrVolumeResponseDto } from './dtos/get-exchange-24hr-volume-response.dto';
+import { OtpAuthGuard } from './guards';
 
 @Controller()
 export class AppController {
@@ -81,6 +82,7 @@ export class AppController {
   @Serialize(GetUserBalanceResponseDto)
   @Get(`${Path.ACCOUNT}/${Path.BALANCE}`)
   @HttpCode(HttpStatus.OK)
+  // @UseGuards(OtpAuthGuard)
   public async getAccountBalance(@Query('email') email: string) {
     return this.appService.getAccountBalance(email);
   }

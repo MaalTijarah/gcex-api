@@ -6,6 +6,7 @@ import { join } from 'path';
 import { EmailsService } from './emails.service';
 import { LoggerModule } from '../logger';
 import { EnvVar } from 'src/enums';
+import { EmailsController } from './emails.controller';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { EnvVar } from 'src/enums';
     }),
     LoggerModule,
   ],
+  controllers: [EmailsController],
   providers: [EmailsService],
   exports: [EmailsService],
 })
