@@ -9,6 +9,7 @@ import { AppRepository } from './app.repository';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailsModule } from './emails';
 import { SrCardsModule } from './sr-cards/sr-cards.module';
+import { PricesModule } from './prices/prices.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { SrCardsModule } from './sr-cards/sr-cards.module';
     }),
     EmailsModule,
     SrCardsModule,
+    PricesModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppRepository],

@@ -28,10 +28,10 @@ export class SrCardsService {
     private readonly http: HttpService,
     private readonly config: ConfigService,
     private readonly logger: Logger,
-  ) {}
+  ) { }
 
-  // @Cron('0 */6 * * *') // Every 6 hours
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron('0 */6 * * *') // Every 6 hours
+  // @Cron(CronExpression.EVERY_10_SECONDS)
   async checkBalanceAndAlert() {
     this.logger.log('SR Cards: Starting balance check...');
 
